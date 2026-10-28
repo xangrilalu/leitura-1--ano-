@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exploradores das Formas Geométricas</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#20304a;background:linear-gradient(135deg,#dbeafe,#fef3c7);min-height:100vh}
+header{text-align:center;background:#0f766e;color:white;padding:22px 14px}header h1{margin:0 0 7px;font-size:clamp(1.5rem,4vw,2.25rem)}header p{margin:0}
+main{max-width:850px;margin:20px auto;padding:0 14px 28px}.stats{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}.pill{background:white;border-radius:999px;padding:10px 14px;font-weight:bold;box-shadow:0 2px 8px #0001}
+.progress{height:10px;background:#bfdbfe;border-radius:99px;overflow:hidden;margin:14px 0}.bar{height:100%;background:#14b8a6;width:0;transition:width .25s}
+.card{background:white;border-radius:22px;padding:clamp(18px,4vw,30px);box-shadow:0 8px 24px #0f766e14;margin-bottom:16px}.tag{display:inline-block;background:#ccfbf1;color:#115e59;padding:6px 10px;border-radius:999px;font-weight:bold;font-size:.9rem}
+h2{margin:12px 0;font-size:1.45rem}.question{font-size:1.12rem;line-height:1.5}.shapearea{display:flex;justify-content:center;align-items:center;min-height:155px;margin:8px 0 16px}
+.shape{width:120px;height:120px;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:bold;color:#172554}.circle{border-radius:50%;background:#60a5fa;border:4px solid #2563eb}.square{background:#fbbf24;border:4px solid #d97706}.triangle{width:0;height:0;border-left:70px solid transparent;border-right:70px solid transparent;border-bottom:125px solid #fb7185;position:relative}.triangle:after{content:"";position:absolute;left:-48px;top:42px;color:#881337;font-weight:bold;font-size:14px;white-space:nowrap}.rectangle{width:150px;height:90px;background:#86efac;border:4px solid #16a34a}.diamond{width:88px;height:88px;background:#c4b5fd;border:4px solid #7c3aed;transform:rotate(45deg)}.diamond span{transform:rotate(-45deg)}
+.options{display:grid;grid-template-columns:1fr;gap:10px;margin-top:16px}button{font:inherit;font-weight:bold;border:0;border-radius:14px;padding:14px 16px;cursor:pointer}.option{background:#eff6ff;border:2px solid #bfdbfe;color:#1d4ed8;text-align:left}.option:disabled{cursor:default}.primary{background:#f97316;color:white}.feedback{min-height:28px;margin-top:14px;font-weight:bold;line-height:1.45}.hidden{display:none}.small{font-size:.92rem;color:#475569;line-height:1.5}
+@media(min-width:600px){.options{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header><h1>🔎 Exploradores das Formas Geométricas</h1><p>Jogo educativo • 1º ano do Ensino Fundamental</p></header>
+<main>
+<div class="stats"><div class="pill">⭐ Pontos: <span id="score">0</span></div><div class="pill">🎯 Desafio <span id="num">1</span> de 8</div></div>
+<div class="progress"><div class="bar" id="bar"></div></div>
+<section class="card" id="game">
+<span class="tag" id="tag">CONHECENDO AS FORMAS</span><h2 id="title">Vamos explorar!</h2><p class="question" id="question"></p>
+<div class="shapearea" id="shapearea"></div><div class="options" id="options"></div><div class="feedback" id="feedback" aria-live="polite"></div><button class="primary hidden" id="next" onclick="next()">Próximo desafio ➜</button>
+</section>
+<section class="card hidden" id="end"><h2>🏆 Missão cumprida!</h2><p class="question" id="result"></p><p id="endmsg"></p><button class="primary" onclick="restart()">Jogar novamente ↻</button></section>
+<section class="card"><h2>🧠 O que vamos aprender?</h2><p class="small">Reconhecer círculo, quadrado, triângulo e retângulo; observar lados e cantos; encontrar formas em objetos do dia a dia; seguir instruções simples e prestar atenção aos detalhes.</p><p class="small">Dica para a professora: convide as crianças a dizer o nome da forma em voz alta e a procurar objetos parecidos na sala.</p></section>
+</main><footer style="text-align:center;color:#475569;padding:0 12px 24px">EMEF Sambaqui • Aprender brincando!</footer>
+<script>
+const qs=[
+{tag:"RECONHECIMENTO",title:"Desafio 1 — Qual é a forma?",q:"Que forma geométrica aparece aqui?",shape:"circle",opts:["CÍRCULO","QUADRADO","TRIÂNGULO"],a:0,why:"O círculo é redondo e não tem pontas."},
+{tag:"RECONHECIMENTO",title:"Desafio 2 — Conte os lados",q:"Qual forma tem 3 lados?",shape:"triangle",opts:["RETÂNGULO","TRIÂNGULO","CÍRCULO"],a:1,why:"Isso! TRIÂNGULO tem 3 lados e 3 cantinhos."},
+{tag:"RECONHECIMENTO",title:"Desafio 3 — Quatro lados iguais",q:"Qual forma tem 4 lados iguais?",shape:"square",opts:["QUADRADO","CÍRCULO","RETÂNGULO"],a:0,why:"Muito bem! O quadrado tem 4 lados do mesmo tamanho."},
+{tag:"OLHE AO REDOR",title:"Desafio 4 — Encontre na sala",q:"Qual objeto costuma ter a forma parecida com um retângulo?",shape:"rectangle",opts:["Uma porta","Uma bola","Um prato redondo"],a:0,why:"A porta costuma parecer um retângulo."},
+{tag:"OBSERVE OS DETALHES",title:"Desafio 5 — Tem cantinhos?",q:"Qual destas formas não tem cantinhos?",shape:"circle",opts:["QUADRADO","TRIÂNGULO","CÍRCULO"],a:2,why:"O círculo é redondo e não tem vértices (cantinhos)."},
+{tag:"PENSAMENTO COMPUTACIONAL",title:"Desafio 6 — Siga a instrução",q:"A professora pediu: “Escolha a forma com 4 lados iguais”. O que deves escolher?",shape:"square",opts:["CÍRCULO","QUADRADO","TRIÂNGULO"],a:1,why:"Seguiste a instrução: o quadrado tem 4 lados iguais."},
+{tag:"PADRÕES",title:"Desafio 7 — Descubra a sequência",q:"Observe: 🔵 🟨 🔵 🟨 🔵 ___. Qual vem agora?",shape:"circle",opts:["🔵 CÍRCULO","🟨 QUADRADO","🔺 TRIÂNGULO"],a:1,why:"O padrão alterna círculo e quadrado. Depois do círculo vem o quadrado."},
+{tag:"DESAFIO FINAL",title:"Desafio 8 — Qual não combina?",q:"CÍRCULO, CÍRCULO, QUADRADO, CÍRCULO. Qual forma aparece diferente das outras?",shape:"square",opts:["CÍRCULO","QUADRADO","TRIÂNGULO"],a:1,why:"Isso! O quadrado é diferente dos círculos."}
+];
+let i=0,score=0,done=false;
+const el=id=>document.getElementById(id);
+function drawShape(s){let box=el("shapearea");box.innerHTML="";let d=document.createElement("div");d.className="shape "+s;if(s==="diamond"){d.innerHTML="<span>LOSANGO</span>"}box.appendChild(d)}
+function render(){done=false;const q=qs[i];el("tag").textContent=q.tag;el("title").textContent=q.title;el("question").textContent=q.q;el("num").textContent=i+1;el("score").textContent=score;el("bar").style.width=(i/qs.length*100)+"%";el("feedback").textContent="";el("next").classList.add("hidden");drawShape(q.shape);let box=el("options");box.innerHTML="";q.opts.forEach((o,j)=>{let b=document.createElement("button");b.className="option";b.textContent=o;b.onclick=()=>answer(j);box.appendChild(b)})}
+function answer(j){if(done)return;done=true;const q=qs[i];[...el("options").children].forEach((b,k)=>{b.disabled=true;if(k===q.a){b.style.background="#dcfce7";b.style.borderColor="#22c55e"}else if(k===j){b.style.background="#fee2e2";b.style.borderColor="#ef4444"}});if(j===q.a){score+=10;el("feedback").style.color="#15803d";el("feedback").textContent="✅ Muito bem! +10 pontos. "+q.why}else{el("feedback").style.color="#b45309";el("feedback").textContent="💡 Vamos aprender! "+q.why}el("score").textContent=score;el("next").textContent=i===qs.length-1?"Ver resultado 🏆":"Próximo desafio ➜";el("next").classList.remove("hidden")}
+function next(){if(i<qs.length-1){i++;render()}else{el("game").classList.add("hidden");el("end").classList.remove("hidden");el("bar").style.width="100%";el("result").textContent="Conseguiste "+score+" de 80 pontos!";el("endmsg").textContent=score>=60?"Parabéns, explorador(a)! Tu observaste, pensaste e encontraste as formas!":"Muito bem por jogar até o fim! Vamos praticar mais uma vez e aprender ainda mais."}}
+function restart(){i=0;score=0;el("end").classList.add("hidden");el("game").classList.remove("hidden");render()}
+render();
+</script>
+</body></html>
